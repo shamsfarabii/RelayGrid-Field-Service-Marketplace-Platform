@@ -65,7 +65,15 @@ class WorkOrderRepository implements WorkOrderRepositoryInterface
 
         $sql = "UPDATE work_orders SET " . implode(', ', $fields) . " WHERE id = :id";
 
-        $stmt = $this->db->prepare($sql);
+        $stmt = $this->db->prepare(query: $sql);
         return $stmt->execute($params);
+    }
+
+    public function delete(int $id): bool
+    {
+        $sql = "DELETE FROM work_orders WHERE id = :id";
+        $stmt = $this->db->prepare($sql);
+        return $stmt->execute([':id' => $id]);
+
     }
 }

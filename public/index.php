@@ -8,12 +8,12 @@ use App\Routing\Router;
 
 $router = new Router();
 
-// Define routes
 $router->get('/work-orders', 'App\Controllers\WorkOrderController@index');
 $router->get('/work-orders/{id}', 'App\Controllers\WorkOrderController@show');
 
 $router->post('/work-orders', 'App\Controllers\WorkOrderController@store');
 $router->put('/work-orders/{id}', 'App\Controllers\WorkOrderController@update');
 
-// Dispatch
+$router->delete('/work-orders/{id}', 'App\Controllers\WorkOrderController@destroy');
+
 $router->dispatch($_SERVER['REQUEST_URI'], $_SERVER['REQUEST_METHOD']);

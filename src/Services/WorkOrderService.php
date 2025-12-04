@@ -40,4 +40,12 @@ class WorkOrderService
 
         return $this->repo->update($id, $data);
     }
+
+    public function delete(int $id): bool
+    {
+        if (!$this->repo->findById($id)) {
+            throw new \Exception("Work order $id not found");
+        }
+        return $this->repo->delete($id);
+    }
 }

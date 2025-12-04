@@ -46,7 +46,19 @@ class WorkOrderController
             $service = new \App\Services\WorkOrderService($this->repo);
             $ok = $service->update($id, $data);
 
-            \App\Http\Response::json(['updated' => $ok]);
+            \App\Http\Response::json(['success' => $ok, 'status' => 200], 0);
+        } catch (\Exception $e) {
+            \App\Http\Response::error($e->getMessage(), 400);
+        }
+    }
+
+    public function destroy(int $id): void
+    {
+        try {
+            $service = new \App\Services\WorkOrderService($this->repo);
+            $ok = $service->delete($id);
+
+            \App\Http\Response::json(['success' => $ok, 'status' => 200], 0);
         } catch (\Exception $e) {
             \App\Http\Response::error($e->getMessage(), 400);
         }

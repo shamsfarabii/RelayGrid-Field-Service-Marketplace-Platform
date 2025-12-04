@@ -6,11 +6,12 @@ class Router
 {
     private array $routes = [];
 
-    public function get(string $uri, string $action) { $this->register('GET', $uri, $action); }
-    public function post(string $uri, string $action) { $this->register('POST', $uri, $action); }
-    public function put(string $uri, string $action) { $this->register('PUT', $uri, $action); }
+    public function get(string $uri, string $action)    { $this->register('GET', $uri, $action); }
+    public function post(string $uri, string $action)   { $this->register('POST', $uri, $action); }
+    public function put(string $uri, string $action)    { $this->register('PUT', $uri, $action); }
+    public function delete(string $uri, string $action) { $this->register('DELETE', $uri, $action); }
 
-    private function register(string $method, string $uri, string $action)
+    private function register(string $method, string $uri, string $action): void
     {
         $this->routes[$method][$uri] = $action;
     }
@@ -18,6 +19,14 @@ class Router
     public function dispatch(string $uri, string $method)
     {
         $uri = parse_url($uri, PHP_URL_PATH);
+        $method = strtoupper($method);
+
+        if (!isset($this->routes[$method])) {
+            http_response_code(404);
+            header('Content-Type: application/json');
+            echo json_encode(['error' => 'Route not found']);
+            return;
+        }
 
         foreach ($this->routes[$method] as $route => $action) {
             $pattern = preg_replace('#\{[^}]+\}#', '([^/]+)', $route);
@@ -29,6 +38,7 @@ class Router
         }
 
         http_response_code(404);
+        header('Content-Type: application/json');
         echo json_encode(['error' => 'Route not found']);
     }
 
