@@ -25,11 +25,30 @@ class WorkOrderController
 
     public function store()
     {
-        echo json_encode(['message' => 'POST not implemented yet']);
+        try {
+            $data = \App\Http\Request::json();
+
+            $service = new \App\Services\WorkOrderService($this->repo);
+            $id = $service->create($data);
+
+            \App\Http\Response::json(['id' => $id], 201);
+        } catch (\Exception $e) {
+            \App\Http\Response::error($e->getMessage(), 400);
+        }
     }
+
 
     public function update(int $id)
     {
-        echo json_encode(['message' => 'PUT not implemented yet']);
+        try {
+            $data = \App\Http\Request::json();
+
+            $service = new \App\Services\WorkOrderService($this->repo);
+            $ok = $service->update($id, $data);
+
+            \App\Http\Response::json(['updated' => $ok]);
+        } catch (\Exception $e) {
+            \App\Http\Response::error($e->getMessage(), 400);
+        }
     }
 }
