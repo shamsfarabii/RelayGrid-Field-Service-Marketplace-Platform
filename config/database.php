@@ -1,9 +1,11 @@
 <?php
 
+require_once __DIR__ . '/env.php';
+
 return [
-    'host'     => '127.0.0.1',
-    'database' => 'fielddesk_legacy',
-    'username' => 'farabi_fd',
-    'password' => '21299',
-    'charset'  => 'utf8mb4'
+    'host'     => env('DB_HOST', '127.0.0.1'),
+    'database' => env('DB_NAME', 'fielddesk_legacy'),
+    'username' => env('DB_USER', 'root'),
+    'password' => env('DB_PASS', ''),
+    'charset'  => env('DB_CHARSET', 'utf8mb4'),
 ];

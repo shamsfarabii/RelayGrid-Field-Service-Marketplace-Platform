@@ -31,17 +31,30 @@ class CompanyRepository implements CompanyRepositoryInterface
 
     public function create(array $data): int
     {
-        $sql = "INSERT INTO companies (name, contact_email, contact_phone)
-                VALUES (:name, :contact_email, :contact_phone)";
+        $sql = "INSERT INTO companies (user_id, name, contact_email, contact_phone)
+            VALUES (:user_id, :name, :contact_email, :contact_phone)";
+
         $stmt = $this->db->prepare($sql);
         $stmt->execute([
-            ':name' => $data['name'],
+            ':user_id'       => $data['user_id'] ?? null,
+            ':name'          => $data['name'],
             ':contact_email' => $data['contact_email'],
             ':contact_phone' => $data['contact_phone'] ?? null,
         ]);
 
         return (int)$this->db->lastInsertId();
     }
+
+    public function findByUserId(int $userId): ?array
+{
+    $stmt = $this->db->prepare("SELECT * FROM companies WHERE user_id = :user_id LIMIT 1");
+    $stmt->execute([':user_id' => $userId]);
+    $row = $stmt->fetch();
+
+    return $row ?: null;
+}
+
+
 
     public function update(int $id, array $data): bool
     {

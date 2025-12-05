@@ -31,20 +31,33 @@ class TechnicianRepository implements TechnicianRepositoryInterface
 
     public function create(array $data): int
     {
-        $sql = "INSERT INTO technicians (first_name, last_name, email, phone, region)
-                VALUES (:first_name, :last_name, :email, :phone, :region)";
+        $sql = "INSERT INTO technicians (user_id, first_name, last_name, email, phone, region, status)
+            VALUES (:user_id, :first_name, :last_name, :email, :phone, :region, :status)";
 
         $stmt = $this->db->prepare($sql);
         $stmt->execute([
+            ':user_id'    => $data['user_id'] ?? null,
             ':first_name' => $data['first_name'],
             ':last_name'  => $data['last_name'],
             ':email'      => $data['email'],
             ':phone'      => $data['phone'] ?? null,
             ':region'     => $data['region'] ?? null,
+            ':status'     => $data['status'] ?? 'active',
         ]);
 
         return (int)$this->db->lastInsertId();
     }
+
+    public function findByUserId(int $userId): ?array
+    {
+        $stmt = $this->db->prepare("SELECT * FROM technicians WHERE user_id = :user_id LIMIT 1");
+        $stmt->execute([':user_id' => $userId]);
+
+        $row = $stmt->fetch();
+        return $row ?: null;
+    }
+
+
 
     public function update(int $id, array $data): bool
     {

@@ -11,4 +11,6 @@ interface WorkOrderAssignmentRepositoryInterface
     public function findByWorkOrder(int $workOrderId): array;
 
     public function findByTechnician(int $technicianId): array;
+
+    public function findById(int $id): ?array;
 }

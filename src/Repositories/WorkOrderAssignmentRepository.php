@@ -33,20 +33,33 @@ class WorkOrderAssignmentRepository implements WorkOrderAssignmentRepositoryInte
 
     public function updateStatus(int $id, string $status): bool
     {
+        // Set appropriate timestamps by status
+        $fields = ['status = :status', 'updated_at = NOW()'];
+        $params = [
+            ':id'     => $id,
+            ':status' => $status,
+        ];
+
+        if ($status === 'accepted') {
+            $fields[] = 'accepted_at = NOW()';
+        }
+
+        if ($status === 'completed') {
+            $fields[] = 'completed_at = NOW()';
+        }
+
         $sql = "UPDATE work_order_assignments
-                SET status = :status, updated_at = NOW()
+                SET " . implode(', ', $fields) . "
                 WHERE id = :id";
 
         $stmt = $this->db->prepare($sql);
-        return $stmt->execute([
-            ':status' => $status,
-            ':id'     => $id,
-        ]);
+        return $stmt->execute($params);
     }
 
     public function findByWorkOrder(int $workOrderId): array
     {
-        $sql = "SELECT * FROM work_order_assignments
+        $sql = "SELECT *
+                FROM work_order_assignments
                 WHERE work_order_id = :work_order_id
                 ORDER BY created_at ASC";
 
@@ -58,7 +71,8 @@ class WorkOrderAssignmentRepository implements WorkOrderAssignmentRepositoryInte
 
     public function findByTechnician(int $technicianId): array
     {
-        $sql = "SELECT * FROM work_order_assignments
+        $sql = "SELECT *
+                FROM work_order_assignments
                 WHERE technician_id = :technician_id
                 ORDER BY created_at DESC";
 
@@ -66,5 +80,16 @@ class WorkOrderAssignmentRepository implements WorkOrderAssignmentRepositoryInte
         $stmt->execute([':technician_id' => $technicianId]);
 
         return $stmt->fetchAll();
+    }
+
+    public function findById(int $id): ?array
+    {
+        $stmt = $this->db->prepare(
+            "SELECT * FROM work_order_assignments WHERE id = :id"
+        );
+        $stmt->execute([':id' => $id]);
+        $row = $stmt->fetch();
+
+        return $row ?: null;
     }
 }
