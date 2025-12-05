@@ -3,6 +3,7 @@
 namespace App\Controllers;
 
 use App\Repositories\WorkOrderRepository;
+use App\Http\Response;
 
 class WorkOrderController
 {
@@ -15,8 +16,34 @@ class WorkOrderController
 
     public function index()
     {
-        echo json_encode($this->repo->findAll());
+        // Read query params
+        $page     = isset($_GET['page']) ? (int)$_GET['page'] : 1;
+        $perPage  = isset($_GET['perPage']) ? (int)$_GET['perPage'] : 20;
+
+        $filters = [
+            'company_id' => $_GET['company_id'] ?? null,
+            'status'     => $_GET['status'] ?? null,
+            'start_date' => $_GET['start'] ?? null,
+            'end_date'   => $_GET['end'] ?? null,
+        ];
+
+        $items = $this->repo->findByFilters($filters, $page, $perPage);
+        $total = $this->repo->countByFilters($filters);
+
+        $totalPages = (int)ceil($total / max(1, $perPage));
+
+        \App\Http\Response::json([
+            'success'    => true,
+            'status'     => 200,
+            'page'       => $page,
+            'perPage'    => $perPage,
+            'total'      => $total,
+            'totalPages' => $totalPages,
+            'count'      => count($items),
+            'items'      => $items,
+        ]);
     }
+
 
     public function show(int $id)
     {
@@ -36,6 +63,26 @@ class WorkOrderController
             \App\Http\Response::error($e->getMessage(), 400);
         }
     }
+
+    public function storeBulk()
+    {
+        try {
+            $data = \App\Http\Request::json();
+
+            $service = new \App\Services\WorkOrderService($this->repo);
+            $ids = $service->createBulk($data);
+
+            \App\Http\Response::json([
+                'success' => true,
+                'status'  => 201,
+                'count'   => count($ids),
+                'ids'     => $ids,
+            ], 201);
+        } catch (\Exception $e) {
+            \App\Http\Response::error($e->getMessage(), 400);
+        }
+    }
+
 
 
     public function update(int $id)

@@ -32,6 +32,26 @@ class WorkOrderService
         return $this->repo->create($data);
     }
 
+    public function createBulk(array $items): array
+    {
+        if (!is_array($items) || $items === []) {
+            throw new \Exception('Payload must be a non-empty array of work orders');
+        }
+
+        $validated = [];
+
+        foreach ($items as $index => $item) {
+            if (!is_array($item)) {
+                throw new \Exception("Item at index {$index} must be an object");
+            }
+
+            $validated[] = $this->validateCreate($item);
+        }
+
+        return $this->repo->createMany($validated);
+    }
+
+
     public function update(int $id, array $data): bool
     {
         if (!$this->repo->findById($id)) {

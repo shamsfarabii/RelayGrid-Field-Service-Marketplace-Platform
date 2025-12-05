@@ -2,7 +2,7 @@
 
 namespace App\Repositories;
 
-interface WorkOrderRepositoryInterface
+interface CompanyRepositoryInterface
 {
     public function findAll(): array;
 
@@ -13,10 +13,4 @@ interface WorkOrderRepositoryInterface
     public function update(int $id, array $data): bool;
 
     public function delete(int $id): bool;
-
-    public function createMany(array $items): array;
-
-    public function findByFilters(array $filters, int $page = 1, int $perPage = 20): array;
-
-    public function countByFilters(array $filters): int;
 }
