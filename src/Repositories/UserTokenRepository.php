@@ -19,17 +19,22 @@ class UserTokenRepository
         $token = bin2hex(random_bytes(32));
 
         $sql = "INSERT INTO user_tokens (user_id, token, expires_at)
-                VALUES (:user_id, :token, :expires_at)";
+            VALUES (:user_id, :token, :expires_at)
+            ON DUPLICATE KEY UPDATE
+                token = VALUES(token),
+                expires_at = VALUES(expires_at),
+                created_at = NOW()";
 
         $stmt = $this->db->prepare($sql);
         $stmt->execute([
-            ':user_id'   => $userId,
-            ':token'     => $token,
-            ':expires_at'=> $expiresAt ? $expiresAt->format('Y-m-d H:i:s') : null,
+            ':user_id'    => $userId,
+            ':token'      => $token,
+            ':expires_at' => $expiresAt ? $expiresAt->format('Y-m-d H:i:s') : null,
         ]);
 
         return $token;
     }
+
 
     public function findUserByToken(string $token): ?array
     {

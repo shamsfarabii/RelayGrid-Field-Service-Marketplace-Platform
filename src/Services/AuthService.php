@@ -37,4 +37,18 @@ class AuthService
         $expiresAt = new \DateTimeImmutable('+30 days');
         return $this->tokens->createToken((int)$user['id'], $expiresAt);
     }
+
+    public function getUserData(string $token): array
+    {
+        $user = $this->tokens->findUserByToken($token);
+
+        if (!$user) {
+            throw new \Exception('Invalid Token');
+        }
+
+        return [
+            "email" => $user["email"],
+            "role" => $user["role"]
+        ];
+    }
 }

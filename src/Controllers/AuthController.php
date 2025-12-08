@@ -55,8 +55,9 @@ class AuthController
             }
 
             $token = $this->service->login($email, $password);
+            $userData = $this->service->getUserData($token);
 
-            Response::success(['token' => $token], 200);
+            Response::success(['token' => $token,'user' => $userData], 200);
 
         } catch (\Exception $e) {
             Response::error($e->getMessage(), 400);
